@@ -1,8 +1,7 @@
-# math-tutor
-This is our final project for the NLP Systems. We developed an Agentic LLM mean to for tutoring middle school aged children with math problems. This LLM acts as a tutor by reasoning
-and planning the steps for solving a math problem, and providing LaTeX formulas to guide the user to solve the problem.
+# Prosthetics Agent
+Capstone project
 
-Ben Lambright, Sunny Zhou, Jordan Youner
+Ben Lambright
 
 ## Features
 - Front-end chatbot interface
