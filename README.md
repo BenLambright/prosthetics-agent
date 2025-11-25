@@ -43,11 +43,11 @@ Clone the repo, and cd to the directory. Once you are cd'ed into the directory, 
 Build the docker app
 ```shell
 # Build the image
-docker build -t math_tutor .
+docker build -t prosthetics-agent .
 ```
 Once you have run the Docker app, make sure to run the image as so, in order for you to be able to access the port:
 ```shell
 # Run the image
-docker run -p [PORT]:5000 math_tutor
+docker run -p [PORT]:4999 prosthetics-agent
 ```
 Finally, you should be able to access the website on the following page: `localhost:[PORT]`

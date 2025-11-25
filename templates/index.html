@@ -41,26 +41,49 @@
   <button onclick="sendMessage()">Send</button>
 </div>
 <script>
-  async function sendMessage() {
-    const inputField = document.getElementById('user-input');
-    const message = inputField.value;
-    if (!message.trim()) return;
+    async function sendMessage() {
+      const inputField = document.getElementById('user-input');
+      const message = inputField.value;
+      if (!message.trim()) return;
 
-    addMessage('user', message);
-    inputField.value = '';
+      addMessage('user', message);
+      inputField.value = '';
 
-    const response = await fetch('/chat', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({message: message})
-    });
-    const data = await response.json();
+      const response = await fetch('/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message: message})
+      });
+      const data = await response.json();
+      // console.log("Full bot response:", data);
 
-    addMessage('bot', data.response);
+      // Add bot text
+      addMessage('bot', data.response);
 
-    // After adding bot response, trigger MathJax typesetting
+      // Add context images and text
+      if (data.context && data.context.length > 0) {
+        data.context.forEach(source => {
+          // Add clipped text
+          // if (source.text) addMessage('bot', source.text);s
+
+          // Add images
+          if (source.images && source.images.length > 0) {
+            source.images.forEach(img_src => {
+              const chatbox = document.getElementById('chatbox');
+              const imgElem = document.createElement('img');
+              imgElem.src = img_src;
+              imgElem.style.maxWidth = '400px';
+              imgElem.style.display = 'block';
+              imgElem.style.margin = '0.5rem 0';
+              chatbox.appendChild(imgElem);
+              chatbox.scrollTop = chatbox.scrollHeight;
+            });
+          }
+        });
+      }
+
+    // Trigger MathJax typesetting
     MathJax.typeset();
-
   }
 
   function addMessage(sender, text) {

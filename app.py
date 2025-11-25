@@ -1,18 +1,23 @@
 from flask import Flask, render_template, request, url_for, jsonify
-from langchain_core.messages import HumanMessage, SystemMessage
-from agent import Agent
+# from langchain_core.messages import HumanMessage, SystemMessage
+# from agent import Agent
+# from pydantic_ai import Agent, RunContext
+from document_processing.process import RAGBot, get_prompt_template
 from utils import load_credentials
 import time
 import os
 
 app = Flask(__name__)
-agent = Agent("meta-llama/Llama-3.3-70B-Instruct-Turbo-Free")
+# agent = Agent('google-gla:gemini-2.5-flash')
 config = {"configurable": {"thread_id": "abc123"}}
-messages = [SystemMessage(content=agent.system_prompts["default"])]
+# messages = [SystemMessage(content=agent.system_prompts["default"])]
 # create text file to store conversation
 os.makedirs("./conversations/", exist_ok = True)
 convo_txt = "./conversations/" + time.ctime().replace(' ', '_').replace(':', '_')
 
+ragbot = RAGBot(source_dir="test_pages")
+retriever, doc_store = ragbot.process_documents()
+rag_chain = ragbot.build_bot(retriever, get_prompt_template())
 
 @app.route("/")
 def root():
@@ -22,22 +27,35 @@ def root():
 @app.route("/chat", methods=["POST"])
 def get_tutor_response():
     user_msg = request.json['message']
-    # this is a placeholder because i'm not really sure it works this way
-    # plus casting generator to list every time is bad
-    messages.append(HumanMessage(content=user_msg))
-    steps = list(agent.tool_agent.stream(
-            {"messages": messages},
-            config,
-            stream_mode="values"))
-    response = steps[-1]["messages"][-1].pretty_repr(html=True)
+    # response = ragbot.query(user_msg, rag_chain, get_images=False, doc_store=doc_store)
+    # multimodal:
+    response = ragbot.query(user_msg, rag_chain, get_images=True, doc_store=doc_store)
+    answer = response['answer']
+    if 'images' in response:
+        print("images are thiere...")
+    else:
+        print(response.keys())
     with open(convo_txt, 'a') as f:
         f.write('User: ' + user_msg + '\n')
-        f.write('Bot: ' + response + '\n')
-    return jsonify({'response':response})
+        f.write('Bot: ' + answer + '\n')
+    # return jsonify({'response':answer})
+
+    # Build context list for frontend
+    context_list = []
+    if 'images' in response and response['images']:
+        context_list.append({
+            "text": answer,       # or clipped context text if available
+            "images": response['images']
+        })
+
+    return jsonify({
+        "response": response["answer"],
+        "context": context_list
+    })
 
 
 
 
 if __name__ == "__main__":
     load_credentials()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=4999, debug=False)
