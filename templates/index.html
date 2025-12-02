@@ -82,6 +82,18 @@
         });
       }
 
+      if (data.file_url) {
+          const chatbox = document.getElementById('chatbox');   // <-- ADD THIS
+          const link = document.createElement("a");
+          link.href = data.file_url;
+          link.textContent = "Download generated file";
+          link.target = "_blank";
+          link.style.display = "block";       // keeps it on its own line
+          link.style.margin = "0.5rem 0";
+          chatbox.appendChild(link);
+          chatbox.scrollTop = chatbox.scrollHeight;
+      }
+
     // Trigger MathJax typesetting
     MathJax.typeset();
   }
