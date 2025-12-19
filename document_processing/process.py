@@ -52,7 +52,7 @@ class RAGBot:
         self.sources = [os.path.join(script_dir, source_dir, f) for f in self.sources]
         print(f"Sources: {self.sources}")
         self.embed_model_id = "sentence-transformers/all-MiniLM-L6-v2"
-        self.gen_model_id = "Qwen/Qwen2.5-7B-Instruct"
+        # self.gen_model_id = "Qwen/Qwen2.5-7B-Instruct"
         # PROMPT = PromptTemplate.from_template(
         #     "Context information is below.\n---------------------\n{context}\n---------------------\nGiven the context information and not prior knowledge, answer the query.\nQuery: {input}\nAnswer:\n",
         # )
